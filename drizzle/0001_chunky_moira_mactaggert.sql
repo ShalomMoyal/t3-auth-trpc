@@ -1,0 +1,1 @@
+ALTER TABLE "t3-auth-trpc_user" ADD COLUMN "password" varchar(255) NOT NULL;
