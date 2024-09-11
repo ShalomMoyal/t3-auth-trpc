@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { api } from "@/trpc/react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { api } from "@/trpc/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,6 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { AuthorizedLayout } from "@/components/AuthorizedLayout";
 
 export default function PostCRUD() {
   const { data: session, status } = useSession();
@@ -85,94 +86,98 @@ export default function PostCRUD() {
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="mb-6 text-3xl font-bold">Posts CRUD</h1>
+    <AuthorizedLayout>
+      <div className="container mx-auto p-4">
+        <h1 className="mb-6 text-3xl font-bold">Posts CRUD</h1>
 
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle>{editingPost ? "Edit Post" : "Create New Post"}</CardTitle>
-        </CardHeader>
-        <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
-            <Input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Post title"
-              className="w-full"
-              required // Add this to ensure the field is not empty
-            />
-            <Textarea
-              value={body}
-              onChange={(e) => setBody(e.target.value)}
-              placeholder="Post body"
-              className="w-full"
-              required // Add this to ensure the field is not empty
-            />
-          </CardContent>
-          <CardFooter className="flex justify-between">
-            {editingPost && (
-              <Button type="button" variant="outline" onClick={handleCancel}>
-                Cancel
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle>
+              {editingPost ? "Edit Post" : "Create New Post"}
+            </CardTitle>
+          </CardHeader>
+          <form onSubmit={handleSubmit}>
+            <CardContent className="space-y-4">
+              <Input
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Post title"
+                className="w-full"
+                required // Add this to ensure the field is not empty
+              />
+              <Textarea
+                value={body}
+                onChange={(e) => setBody(e.target.value)}
+                placeholder="Post body"
+                className="w-full"
+                required // Add this to ensure the field is not empty
+              />
+            </CardContent>
+            <CardFooter className="flex justify-between">
+              {editingPost && (
+                <Button type="button" variant="outline" onClick={handleCancel}>
+                  Cancel
+                </Button>
+              )}
+              <Button
+                type="submit"
+                className={editingPost ? "w-1/2" : "w-full"}
+                disabled={
+                  createPost.isPending ||
+                  updatePost.isPending ||
+                  !title.trim() ||
+                  !body.trim()
+                } // Disable if fields are empty
+              >
+                {editingPost ? "Update" : "Create"} Post
               </Button>
-            )}
-            <Button
-              type="submit"
-              className={editingPost ? "w-1/2" : "w-full"}
-              disabled={
-                createPost.isPending ||
-                updatePost.isPending ||
-                !title.trim() ||
-                !body.trim()
-              } // Disable if fields are empty
-            >
-              {editingPost ? "Update" : "Create"} Post
-            </Button>
-          </CardFooter>
-        </form>
-      </Card>
+            </CardFooter>
+          </form>
+        </Card>
 
-      {posts.isLoading && <div>Loading posts...</div>}
-      {posts.error && <div>Error loading posts: {posts.error.message}</div>}
-      {posts.data && Array.isArray(posts.data) && posts.data.length === 0 && (
-        <div>No posts found.</div>
-      )}
-      {posts.data && Array.isArray(posts.data) && (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {posts.data.map((post) => (
-            <Card key={post.id}>
-              <CardHeader>
-                <CardTitle>{post.title}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p>{post.body}</p>
-              </CardContent>
-              <CardFooter className="flex justify-between">
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setEditingPost({
-                      id: post.id,
-                      title: post.title ?? "",
-                      body: post.body ?? "",
-                    });
-                    setTitle(post.title ?? "");
-                    setBody(post.body ?? "");
-                  }}
-                >
-                  Edit
-                </Button>
-                <Button
-                  variant="destructive"
-                  onClick={() => deletePost.mutate({ id: post.id })}
-                >
-                  Delete
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
-      )}
-    </div>
+        {posts.isLoading && <div>Loading posts...</div>}
+        {posts.error && <div>Error loading posts: {posts.error.message}</div>}
+        {posts.data && Array.isArray(posts.data) && posts.data.length === 0 && (
+          <div>No posts found.</div>
+        )}
+        {posts.data && Array.isArray(posts.data) && (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {posts.data.map((post) => (
+              <Card key={post.id}>
+                <CardHeader>
+                  <CardTitle>{post.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p>{post.body}</p>
+                </CardContent>
+                <CardFooter className="flex justify-between">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setEditingPost({
+                        id: post.id,
+                        title: post.title ?? "",
+                        body: post.body ?? "",
+                      });
+                      setTitle(post.title ?? "");
+                      setBody(post.body ?? "");
+                    }}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    onClick={() => deletePost.mutate({ id: post.id })}
+                  >
+                    Delete
+                  </Button>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+    </AuthorizedLayout>
   );
 }

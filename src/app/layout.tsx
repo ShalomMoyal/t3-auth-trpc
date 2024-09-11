@@ -1,7 +1,6 @@
 import "@/styles/globals.css";
 
 import { type Metadata } from "next";
-import { headers } from "next/headers";
 
 import { TRPCReactProvider } from "@/trpc/react";
 import { AuthProvider } from "@/components/AuthProvider";
