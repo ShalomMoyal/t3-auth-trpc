@@ -36,6 +36,8 @@ export default function PostCRUD() {
     onSuccess: async () => {
       await utils.post.getAll.invalidate();
       setEditingPost(null);
+      setTitle("");
+      setBody("");
     },
   });
 
@@ -50,6 +52,12 @@ export default function PostCRUD() {
     } else {
       createPost.mutate({ title, body });
     }
+  };
+
+  const handleCancel = () => {
+    setEditingPost(null);
+    setTitle("");
+    setBody("");
   };
 
   return (
@@ -76,10 +84,15 @@ export default function PostCRUD() {
               className="w-full"
             />
           </CardContent>
-          <CardFooter>
+          <CardFooter className="flex justify-between">
+            {editingPost && (
+              <Button type="button" variant="outline" onClick={handleCancel}>
+                Cancel
+              </Button>
+            )}
             <Button
               type="submit"
-              className="w-full"
+              className={editingPost ? "w-1/2" : "w-full"}
               disabled={createPost.isPending || updatePost.isPending}
             >
               {editingPost ? "Update" : "Create"} Post
