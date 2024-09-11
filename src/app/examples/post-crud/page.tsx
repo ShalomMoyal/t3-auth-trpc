@@ -4,19 +4,21 @@ import { useState } from "react";
 import { api } from "@/trpc/react";
 
 export default function PostCRUD() {
-  const [name, setName] = useState("");
+  const [title, setTitle] = useState("");
+  const [body, setBody] = useState("");
   const [editingPost, setEditingPost] = useState<{
     id: number;
-    name: string;
+    title: string;
+    body: string;
   } | null>(null);
 
   const utils = api.useUtils();
   const posts = api.post.getAll.useQuery();
   const createPost = api.post.create.useMutation({
     onSuccess: async () => {
-      // Changed to async
-      await utils.post.getAll.invalidate(); // Await the invalidate call
-      setName("");
+      await utils.post.getAll.invalidate();
+      setTitle("");
+      setBody("");
     },
   });
 
@@ -26,6 +28,7 @@ export default function PostCRUD() {
       setEditingPost(null);
     },
   });
+
   const deletePost = api.post.delete.useMutation({
     onSuccess: () => utils.post.getAll.invalidate(),
   });
@@ -33,9 +36,9 @@ export default function PostCRUD() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (editingPost) {
-      updatePost.mutate({ id: editingPost.id, name });
+      updatePost.mutate({ id: editingPost.id, title, body });
     } else {
-      createPost.mutate({ name });
+      createPost.mutate({ title, body });
     }
   };
 
@@ -46,10 +49,16 @@ export default function PostCRUD() {
       <form onSubmit={handleSubmit} className="mb-4">
         <input
           type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Post name"
-          className="mr-2 rounded-md border p-2 text-black"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Post title"
+          className="mb-2 mr-2 rounded-md border p-2 text-black"
+        />
+        <textarea
+          value={body}
+          onChange={(e) => setBody(e.target.value)}
+          placeholder="Post body"
+          className="mb-2 mr-2 rounded-md border p-2 text-black"
         />
         <button
           type="submit"
@@ -62,11 +71,16 @@ export default function PostCRUD() {
 
       {posts.data?.map((post) => (
         <div key={post.id} className="mb-2 flex items-center">
-          <span className="mr-2">{post.name}</span>
+          <span className="mr-2">{post.title}</span>
           <button
             onClick={() => {
-              setEditingPost({ id: post.id, name: post.name ?? "" });
-              setName(post.name ?? "");
+              setEditingPost({
+                id: post.id,
+                title: post.title ?? "",
+                body: post.body ?? "",
+              });
+              setTitle(post.title ?? "");
+              setBody(post.body ?? "");
             }}
             className="mr-2 rounded-md bg-yellow-500 px-2 py-1 text-white"
           >

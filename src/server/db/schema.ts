@@ -23,7 +23,8 @@ export const posts = createTable(
   "post",
   {
     id: serial("id").primaryKey(),
-    name: varchar("name", { length: 256 }),
+    title: varchar("title", { length: 256 }).notNull(),
+    body: text("body").notNull(),
     createdById: varchar("created_by", { length: 255 })
       .notNull()
       .references(() => users.id),
@@ -36,7 +37,7 @@ export const posts = createTable(
   },
   (example) => ({
     createdByIdIdx: index("created_by_idx").on(example.createdById),
-    nameIndex: index("name_idx").on(example.name),
+    titleIndex: index("title_idx").on(example.title),
   }),
 );
 
