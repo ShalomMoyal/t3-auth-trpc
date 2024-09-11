@@ -12,7 +12,7 @@ import superjson from "superjson";
 import { ZodError } from "zod";
 import { getServerAuthSession } from "@/server/auth";
 import { db } from "@/server/db";
-import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
+import { type NextRequest } from "next/server";
 
 type CreateContextOptions = {
   session: Awaited<ReturnType<typeof getServerAuthSession>> | null;
@@ -37,14 +37,14 @@ const createInnerTRPCContext = async (opts: CreateContextOptions) => {
  *
  * @see https://trpc.io/docs/server/context
  */
-export const createTRPCContext = async (
-  opts: CreateNextContextOptions | {},
-) => {
+export const createTRPCContext = async (opts: { req: NextRequest }) => {
   const session = await getServerAuthSession();
+  console.log("Session in createTRPCContext:", session); // Debug log
 
   return {
     session,
     db,
+    ...opts,
   };
 };
 
@@ -132,13 +132,14 @@ export const publicProcedure = t.procedure.use(timingMiddleware);
  */
 export const protectedProcedure = t.procedure
   .use(timingMiddleware)
-  .use(({ ctx, next }) => {
+  .use(async ({ ctx, next }) => {
     if (!ctx.session || !ctx.session.user) {
+      console.log("Unauthorized access attempt. Session:", ctx.session); // Debug log
       throw new TRPCError({ code: "UNAUTHORIZED" });
     }
     return next({
       ctx: {
-        // infers the `session` as non-nullable
+        ...ctx,
         session: { ...ctx.session, user: ctx.session.user },
       },
     });

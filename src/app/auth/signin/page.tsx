@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,10 +16,13 @@ import {
 export default function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const router = useRouter();
+  const { data: session, status } = useSession();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
     const result = await signIn("credentials", {
       email,
       password,
@@ -27,12 +30,21 @@ export default function SignIn() {
     });
 
     if (result?.error) {
-      // Handle error (e.g., show error message)
       console.error(result.error);
+      setError("Invalid email or password");
     } else {
-      router.push("/"); // Redirect to home page on successful sign-in
+      router.push("/examples/post-crud");
     }
   };
+
+  if (status === "loading") {
+    return <div>Loading...</div>;
+  }
+
+  if (status === "authenticated") {
+    router.push("/examples/post-crud");
+    return null;
+  }
 
   return (
     <div className="container mx-auto p-4">
@@ -56,10 +68,20 @@ export default function SignIn() {
               placeholder="Password"
               required
             />
+            {error && <div className="text-red-500">{error}</div>}
           </CardContent>
-          <CardFooter>
+          <CardFooter className="flex flex-col space-y-4">
             <Button type="submit" className="w-full">
-              Sign In
+              Sign In with Email
+            </Button>
+            <Button
+              type="button"
+              className="w-full"
+              onClick={() =>
+                signIn("discord", { callbackUrl: "/examples/post-crud" })
+              }
+            >
+              Sign In with Discord
             </Button>
           </CardFooter>
         </form>

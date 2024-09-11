@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { api } from "@/trpc/react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,6 +16,8 @@ import {
 } from "@/components/ui/card";
 
 export default function PostCRUD() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [editingPost, setEditingPost] = useState<{
@@ -23,12 +27,17 @@ export default function PostCRUD() {
   } | null>(null);
 
   const utils = api.useUtils();
-  const posts = api.post.getAll.useQuery();
+  const posts = api.post.getAll.useQuery(undefined, {
+    enabled: status === "authenticated",
+  });
   const createPost = api.post.create.useMutation({
     onSuccess: async () => {
       await utils.post.getAll.invalidate();
       setTitle("");
       setBody("");
+    },
+    onError: (error) => {
+      console.error("Error creating post:", error);
     },
   });
 
@@ -45,11 +54,26 @@ export default function PostCRUD() {
     onSuccess: () => utils.post.getAll.invalidate(),
   });
 
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/auth/signin");
+    }
+  }, [status, router]);
+
+  if (status === "loading") {
+    return <div>Loading...</div>;
+  }
+
+  if (status === "unauthenticated") {
+    return null;
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (editingPost) {
       updatePost.mutate({ id: editingPost.id, title, body });
     } else {
+      console.log("Creating post with:", { title, body }); // Debug log
       createPost.mutate({ title, body });
     }
   };
@@ -76,12 +100,14 @@ export default function PostCRUD() {
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Post title"
               className="w-full"
+              required // Add this to ensure the field is not empty
             />
             <Textarea
               value={body}
               onChange={(e) => setBody(e.target.value)}
               placeholder="Post body"
               className="w-full"
+              required // Add this to ensure the field is not empty
             />
           </CardContent>
           <CardFooter className="flex justify-between">
@@ -93,7 +119,12 @@ export default function PostCRUD() {
             <Button
               type="submit"
               className={editingPost ? "w-1/2" : "w-full"}
-              disabled={createPost.isPending || updatePost.isPending}
+              disabled={
+                createPost.isPending ||
+                updatePost.isPending ||
+                !title.trim() ||
+                !body.trim()
+              } // Disable if fields are empty
             >
               {editingPost ? "Update" : "Create"} Post
             </Button>
@@ -101,40 +132,47 @@ export default function PostCRUD() {
         </form>
       </Card>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {posts.data?.map((post) => (
-          <Card key={post.id}>
-            <CardHeader>
-              <CardTitle>{post.title}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>{post.body}</p>
-            </CardContent>
-            <CardFooter className="flex justify-between">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setEditingPost({
-                    id: post.id,
-                    title: post.title ?? "",
-                    body: post.body ?? "",
-                  });
-                  setTitle(post.title ?? "");
-                  setBody(post.body ?? "");
-                }}
-              >
-                Edit
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={() => deletePost.mutate({ id: post.id })}
-              >
-                Delete
-              </Button>
-            </CardFooter>
-          </Card>
-        ))}
-      </div>
+      {posts.isLoading && <div>Loading posts...</div>}
+      {posts.error && <div>Error loading posts: {posts.error.message}</div>}
+      {posts.data && Array.isArray(posts.data) && posts.data.length === 0 && (
+        <div>No posts found.</div>
+      )}
+      {posts.data && Array.isArray(posts.data) && (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {posts.data.map((post) => (
+            <Card key={post.id}>
+              <CardHeader>
+                <CardTitle>{post.title}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p>{post.body}</p>
+              </CardContent>
+              <CardFooter className="flex justify-between">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setEditingPost({
+                      id: post.id,
+                      title: post.title ?? "",
+                      body: post.body ?? "",
+                    });
+                    setTitle(post.title ?? "");
+                    setBody(post.body ?? "");
+                  }}
+                >
+                  Edit
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={() => deletePost.mutate({ id: post.id })}
+                >
+                  Delete
+                </Button>
+              </CardFooter>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

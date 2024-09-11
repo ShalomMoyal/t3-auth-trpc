@@ -16,6 +16,7 @@ import { api } from "@/trpc/react";
 export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const router = useRouter();
 
   const registerMutation = api.auth.register.useMutation({
@@ -24,12 +25,13 @@ export default function Register() {
     },
     onError: (error) => {
       console.error("Registration error:", error);
-      // Handle error (e.g., show error message)
+      setError(error.message);
     },
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
     registerMutation.mutate({ email, password });
   };
 
@@ -55,6 +57,7 @@ export default function Register() {
               placeholder="Password"
               required
             />
+            {error && <div className="text-red-500">{error}</div>}
           </CardContent>
           <CardFooter>
             <Button

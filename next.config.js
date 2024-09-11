@@ -4,7 +4,18 @@
  */
 await import("./src/env.js");
 
-/** @type {import("next").NextConfig} */
-const config = {};
+/** @type {import('next').NextConfig} */
+const config = {
+  reactStrictMode: true,
+  async redirects() {
+    return [
+      {
+        source: "/api/auth/signin",
+        destination: "/auth/signin",
+        permanent: true,
+      },
+    ];
+  },
+};
 
 export default config;

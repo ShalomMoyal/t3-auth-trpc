@@ -18,13 +18,23 @@ export const postRouter = createTRPCRouter({
     }),
 
   create: protectedProcedure
-    .input(z.object({ title: z.string().min(1), body: z.string() }))
+    .input(
+      z.object({
+        title: z.string().min(1, "Title is required"),
+        body: z.string().min(1, "Body is required"),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
-      await ctx.db.insert(posts).values({
-        title: input.title,
-        body: input.body,
+      console.log("Received input in create procedure:", input); // Debug log
+      console.log("Session in create procedure:", ctx.session); // Debug log
+      const { title, body } = input;
+      const result = await ctx.db.insert(posts).values({
+        title,
+        body,
         createdById: ctx.session.user.id,
       });
+      console.log("Insert result:", result); // Debug log
+      return result;
     }),
 
   getLatest: publicProcedure.query(async ({ ctx }) => {
@@ -39,10 +49,11 @@ export const postRouter = createTRPCRouter({
     return "you can now see this secret message!";
   }),
 
-  getAll: protectedProcedure.query(({ ctx }) => {
-    return ctx.db.query.posts.findMany({
+  getAll: protectedProcedure.query(async ({ ctx }) => {
+    const allPosts = await ctx.db.query.posts.findMany({
       orderBy: (posts, { desc }) => [desc(posts.createdAt)],
     });
+    return allPosts;
   }),
 
   update: protectedProcedure
