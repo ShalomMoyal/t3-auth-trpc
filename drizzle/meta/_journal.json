@@ -15,6 +15,13 @@
       "when": 1726075631794,
       "tag": "0001_chunky_moira_mactaggert",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1726086715912,
+      "tag": "0002_nifty_orphan",
+      "breakpoints": true
     }
   ]
 }

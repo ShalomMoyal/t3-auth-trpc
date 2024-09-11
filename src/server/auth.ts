@@ -53,7 +53,12 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
   },
-  adapter: DrizzleAdapter(db) as Adapter,
+  adapter: DrizzleAdapter(db, {
+    users,
+    accounts,
+    sessions,
+    verificationTokens,
+  }) as Adapter,
   providers: [
     DiscordProvider({
       clientId: env.DISCORD_CLIENT_ID,
