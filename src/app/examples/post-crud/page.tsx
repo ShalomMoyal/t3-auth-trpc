@@ -2,6 +2,16 @@
 
 import { useState } from "react";
 import { api } from "@/trpc/react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 export default function PostCRUD() {
   const [title, setTitle] = useState("");
@@ -44,56 +54,74 @@ export default function PostCRUD() {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="mb-4 text-2xl font-bold">Posts CRUD</h1>
+      <h1 className="mb-6 text-3xl font-bold">Posts CRUD</h1>
 
-      <form onSubmit={handleSubmit} className="mb-4">
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Post title"
-          className="mb-2 mr-2 rounded-md border p-2 text-black"
-        />
-        <textarea
-          value={body}
-          onChange={(e) => setBody(e.target.value)}
-          placeholder="Post body"
-          className="mb-2 mr-2 rounded-md border p-2 text-black"
-        />
-        <button
-          type="submit"
-          className="rounded-md bg-blue-500 px-4 py-2 text-white"
-          disabled={createPost.isPending || updatePost.isPending}
-        >
-          {editingPost ? "Update" : "Create"} Post
-        </button>
-      </form>
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle>{editingPost ? "Edit Post" : "Create New Post"}</CardTitle>
+        </CardHeader>
+        <form onSubmit={handleSubmit}>
+          <CardContent className="space-y-4">
+            <Input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Post title"
+              className="w-full"
+            />
+            <Textarea
+              value={body}
+              onChange={(e) => setBody(e.target.value)}
+              placeholder="Post body"
+              className="w-full"
+            />
+          </CardContent>
+          <CardFooter>
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={createPost.isPending || updatePost.isPending}
+            >
+              {editingPost ? "Update" : "Create"} Post
+            </Button>
+          </CardFooter>
+        </form>
+      </Card>
 
-      {posts.data?.map((post) => (
-        <div key={post.id} className="mb-2 flex items-center">
-          <span className="mr-2">{post.title}</span>
-          <button
-            onClick={() => {
-              setEditingPost({
-                id: post.id,
-                title: post.title ?? "",
-                body: post.body ?? "",
-              });
-              setTitle(post.title ?? "");
-              setBody(post.body ?? "");
-            }}
-            className="mr-2 rounded-md bg-yellow-500 px-2 py-1 text-white"
-          >
-            Edit
-          </button>
-          <button
-            onClick={() => deletePost.mutate({ id: post.id })}
-            className="rounded-md bg-red-500 px-2 py-1 text-white"
-          >
-            Delete
-          </button>
-        </div>
-      ))}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {posts.data?.map((post) => (
+          <Card key={post.id}>
+            <CardHeader>
+              <CardTitle>{post.title}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>{post.body}</p>
+            </CardContent>
+            <CardFooter className="flex justify-between">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setEditingPost({
+                    id: post.id,
+                    title: post.title ?? "",
+                    body: post.body ?? "",
+                  });
+                  setTitle(post.title ?? "");
+                  setBody(post.body ?? "");
+                }}
+              >
+                Edit
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => deletePost.mutate({ id: post.id })}
+              >
+                Delete
+              </Button>
+            </CardFooter>
+          </Card>
+        ))}
+      </div>
     </div>
   );
 }
