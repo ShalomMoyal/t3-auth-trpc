@@ -12,9 +12,9 @@ import { compare } from "bcryptjs";
 import { env } from "@/env";
 import { db } from "@/server/db";
 import {
+  users,
   accounts,
   sessions,
-  users,
   verificationTokens,
 } from "@/server/db/schema";
 

@@ -17,35 +17,35 @@ import { type AdapterAccount } from "next-auth/adapters";
  *
  * @see https://orm.drizzle.team/docs/goodies#multi-project-schema
  */
-export const createTable = pgTableCreator((name) => `t3-auth-trpc_${name}`);
+export const createTable = pgTableCreator((name) => `t3_auth_trpc_${name}`);
 
 export const posts = createTable(
-  "post",
+  "posts",
   {
     id: serial("id").primaryKey(),
     title: varchar("title", { length: 256 }).notNull(),
     body: text("body").notNull(),
-    createdById: varchar("created_by", { length: 255 })
+    created_by_id: varchar("created_by_id", { length: 255 })
       .notNull()
       .references(() => users.id),
-    createdAt: timestamp("created_at", { withTimezone: true })
+    created_at: timestamp("created_at", { withTimezone: true })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
+    updated_at: timestamp("updated_at", { withTimezone: true }).$onUpdate(
       () => new Date(),
     ),
   },
-  (example) => ({
-    createdByIdIdx: index("created_by_idx").on(example.createdById),
-    titleIndex: index("title_idx").on(example.title),
+  (table) => ({
+    created_by_id_idx: index("created_by_id_idx").on(table.created_by_id),
+    title_idx: index("title_idx").on(table.title),
   }),
 );
 
-export const users = createTable("user", {
+export const users = createTable("users", {
   id: varchar("id", { length: 255 }).notNull().primaryKey(),
   name: varchar("name", { length: 255 }),
   email: varchar("email", { length: 255 }).notNull().unique(),
-  emailVerified: timestamp("email_verified", { mode: "date" }),
+  email_verified: timestamp("email_verified", { mode: "date" }),
   image: varchar("image", { length: 255 }),
   password: varchar("password", { length: 255 }),
 });
@@ -55,16 +55,16 @@ export const usersRelations = relations(users, ({ many }) => ({
 }));
 
 export const accounts = createTable(
-  "account",
+  "accounts",
   {
-    userId: varchar("user_id", { length: 255 })
+    user_id: varchar("user_id", { length: 255 })
       .notNull()
       .references(() => users.id),
     type: varchar("type", { length: 255 })
       .$type<AdapterAccount["type"]>()
       .notNull(),
     provider: varchar("provider", { length: 255 }).notNull(),
-    providerAccountId: varchar("provider_account_id", {
+    provider_account_id: varchar("provider_account_id", {
       length: 255,
     }).notNull(),
     refresh_token: text("refresh_token"),
@@ -75,44 +75,44 @@ export const accounts = createTable(
     id_token: text("id_token"),
     session_state: varchar("session_state", { length: 255 }),
   },
-  (account) => ({
-    compoundKey: primaryKey(account.provider, account.providerAccountId),
-    userIdIdx: index("user_id_idx").on(account.userId),
+  (table) => ({
+    compound_key: primaryKey(table.provider, table.provider_account_id),
+    session_user_id_idx: index("session_user_id_idx").on(table.user_id),
   }),
 );
 
 export const accountsRelations = relations(accounts, ({ one }) => ({
-  user: one(users, { fields: [accounts.userId], references: [users.id] }),
+  user: one(users, { fields: [accounts.user_id], references: [users.id] }),
 }));
 
 export const sessions = createTable(
-  "session",
+  "sessions",
   {
-    sessionToken: varchar("session_token", { length: 255 })
+    session_token: varchar("session_token", { length: 255 })
       .notNull()
       .primaryKey(),
-    userId: varchar("user_id", { length: 255 })
+    user_id: varchar("user_id", { length: 255 })
       .notNull()
       .references(() => users.id),
     expires: timestamp("expires", { mode: "date" }).notNull(),
   },
-  (session) => ({
-    userIdIdx: index("userId_idx").on(session.userId),
+  (table) => ({
+    accounts_user_id_idx: index("accounts_user_id_idx").on(table.user_id),
   }),
 );
 
 export const sessionsRelations = relations(sessions, ({ one }) => ({
-  user: one(users, { fields: [sessions.userId], references: [users.id] }),
+  user: one(users, { fields: [sessions.user_id], references: [users.id] }),
 }));
 
 export const verificationTokens = createTable(
-  "verification_token",
+  "verification_tokens",
   {
     identifier: varchar("identifier", { length: 255 }).notNull(),
     token: varchar("token", { length: 255 }).notNull(),
     expires: timestamp("expires", { mode: "date" }).notNull(),
   },
-  (vt) => ({
-    compoundKey: primaryKey(vt.identifier, vt.token),
+  (table) => ({
+    compound_key: primaryKey(table.identifier, table.token),
   }),
 );

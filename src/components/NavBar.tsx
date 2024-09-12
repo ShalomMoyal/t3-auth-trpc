@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 export function NavBar() {
   return (
     <nav className="bg-gray-800 p-4">
-      <div className="container mx-auto flex items-center justify-between">
+      <div className="container mx-auto flex justify-between items-center">
         <div className="flex space-x-4">
           <Link href="/" className="text-white hover:text-gray-300">
             Home

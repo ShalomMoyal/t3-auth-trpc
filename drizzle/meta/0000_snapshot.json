@@ -1,11 +1,11 @@
 {
-  "id": "446b8bf6-4d1a-49e5-b922-8a9d252a9a93",
+  "id": "aa0a3053-c11f-46c2-8f29-3126b08f89b6",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.t3-auth-trpc_account": {
-      "name": "t3-auth-trpc_account",
+    "public.t3_auth_trpc_accounts": {
+      "name": "t3_auth_trpc_accounts",
       "schema": "",
       "columns": {
         "user_id": {
@@ -76,8 +76,8 @@
         }
       },
       "indexes": {
-        "account_user_id_idx": {
-          "name": "account_user_id_idx",
+        "session_user_id_idx": {
+          "name": "session_user_id_idx",
           "columns": [
             {
               "expression": "user_id",
@@ -93,10 +93,10 @@
         }
       },
       "foreignKeys": {
-        "t3-auth-trpc_account_user_id_t3-auth-trpc_user_id_fk": {
-          "name": "t3-auth-trpc_account_user_id_t3-auth-trpc_user_id_fk",
-          "tableFrom": "t3-auth-trpc_account",
-          "tableTo": "t3-auth-trpc_user",
+        "t3_auth_trpc_accounts_user_id_t3_auth_trpc_users_id_fk": {
+          "name": "t3_auth_trpc_accounts_user_id_t3_auth_trpc_users_id_fk",
+          "tableFrom": "t3_auth_trpc_accounts",
+          "tableTo": "t3_auth_trpc_users",
           "columnsFrom": [
             "user_id"
           ],
@@ -108,8 +108,8 @@
         }
       },
       "compositePrimaryKeys": {
-        "t3-auth-trpc_account_provider_provider_account_id_pk": {
-          "name": "t3-auth-trpc_account_provider_provider_account_id_pk",
+        "t3_auth_trpc_accounts_provider_provider_account_id_pk": {
+          "name": "t3_auth_trpc_accounts_provider_provider_account_id_pk",
           "columns": [
             "provider",
             "provider_account_id"
@@ -118,8 +118,8 @@
       },
       "uniqueConstraints": {}
     },
-    "public.t3-auth-trpc_post": {
-      "name": "t3-auth-trpc_post",
+    "public.t3_auth_trpc_posts": {
+      "name": "t3_auth_trpc_posts",
       "schema": "",
       "columns": {
         "id": {
@@ -140,8 +140,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "created_by": {
-          "name": "created_by",
+        "created_by_id": {
+          "name": "created_by_id",
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true
@@ -161,11 +161,11 @@
         }
       },
       "indexes": {
-        "created_by_idx": {
-          "name": "created_by_idx",
+        "created_by_id_idx": {
+          "name": "created_by_id_idx",
           "columns": [
             {
-              "expression": "created_by",
+              "expression": "created_by_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -193,12 +193,12 @@
         }
       },
       "foreignKeys": {
-        "t3-auth-trpc_post_created_by_t3-auth-trpc_user_id_fk": {
-          "name": "t3-auth-trpc_post_created_by_t3-auth-trpc_user_id_fk",
-          "tableFrom": "t3-auth-trpc_post",
-          "tableTo": "t3-auth-trpc_user",
+        "t3_auth_trpc_posts_created_by_id_t3_auth_trpc_users_id_fk": {
+          "name": "t3_auth_trpc_posts_created_by_id_t3_auth_trpc_users_id_fk",
+          "tableFrom": "t3_auth_trpc_posts",
+          "tableTo": "t3_auth_trpc_users",
           "columnsFrom": [
-            "created_by"
+            "created_by_id"
           ],
           "columnsTo": [
             "id"
@@ -210,8 +210,8 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "public.t3-auth-trpc_session": {
-      "name": "t3-auth-trpc_session",
+    "public.t3_auth_trpc_sessions": {
+      "name": "t3_auth_trpc_sessions",
       "schema": "",
       "columns": {
         "session_token": {
@@ -228,14 +228,14 @@
         },
         "expires": {
           "name": "expires",
-          "type": "timestamp with time zone",
+          "type": "timestamp",
           "primaryKey": false,
           "notNull": true
         }
       },
       "indexes": {
-        "session_user_id_idx": {
-          "name": "session_user_id_idx",
+        "accounts_user_id_idx": {
+          "name": "accounts_user_id_idx",
           "columns": [
             {
               "expression": "user_id",
@@ -251,10 +251,10 @@
         }
       },
       "foreignKeys": {
-        "t3-auth-trpc_session_user_id_t3-auth-trpc_user_id_fk": {
-          "name": "t3-auth-trpc_session_user_id_t3-auth-trpc_user_id_fk",
-          "tableFrom": "t3-auth-trpc_session",
-          "tableTo": "t3-auth-trpc_user",
+        "t3_auth_trpc_sessions_user_id_t3_auth_trpc_users_id_fk": {
+          "name": "t3_auth_trpc_sessions_user_id_t3_auth_trpc_users_id_fk",
+          "tableFrom": "t3_auth_trpc_sessions",
+          "tableTo": "t3_auth_trpc_users",
           "columnsFrom": [
             "user_id"
           ],
@@ -268,8 +268,8 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "public.t3-auth-trpc_user": {
-      "name": "t3-auth-trpc_user",
+    "public.t3_auth_trpc_users": {
+      "name": "t3_auth_trpc_users",
       "schema": "",
       "columns": {
         "id": {
@@ -292,13 +292,18 @@
         },
         "email_verified": {
           "name": "email_verified",
-          "type": "timestamp with time zone",
+          "type": "timestamp",
           "primaryKey": false,
-          "notNull": false,
-          "default": "CURRENT_TIMESTAMP"
+          "notNull": false
         },
         "image": {
           "name": "image",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "password": {
+          "name": "password",
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": false
@@ -307,10 +312,18 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {
+        "t3_auth_trpc_users_email_unique": {
+          "name": "t3_auth_trpc_users_email_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "email"
+          ]
+        }
+      }
     },
-    "public.t3-auth-trpc_verification_token": {
-      "name": "t3-auth-trpc_verification_token",
+    "public.t3_auth_trpc_verification_tokens": {
+      "name": "t3_auth_trpc_verification_tokens",
       "schema": "",
       "columns": {
         "identifier": {
@@ -327,7 +340,7 @@
         },
         "expires": {
           "name": "expires",
-          "type": "timestamp with time zone",
+          "type": "timestamp",
           "primaryKey": false,
           "notNull": true
         }
@@ -335,8 +348,8 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "t3-auth-trpc_verification_token_identifier_token_pk": {
-          "name": "t3-auth-trpc_verification_token_identifier_token_pk",
+        "t3_auth_trpc_verification_tokens_identifier_token_pk": {
+          "name": "t3_auth_trpc_verification_tokens_identifier_token_pk",
           "columns": [
             "identifier",
             "token"

@@ -31,7 +31,7 @@ export const postRouter = createTRPCRouter({
       const result = await ctx.db.insert(posts).values({
         title,
         body,
-        createdById: ctx.session.user.id,
+        created_by_id: ctx.session.user.id,
       });
       console.log("Insert result:", result); // Debug log
       return result;
@@ -39,7 +39,7 @@ export const postRouter = createTRPCRouter({
 
   getLatest: publicProcedure.query(async ({ ctx }) => {
     const post = await ctx.db.query.posts.findFirst({
-      orderBy: (posts, { desc }) => [desc(posts.createdAt)],
+      orderBy: (posts, { desc }) => [desc(posts.created_at)],
     });
 
     return post ?? null;
@@ -51,7 +51,7 @@ export const postRouter = createTRPCRouter({
 
   getAll: protectedProcedure.query(async ({ ctx }) => {
     const allPosts = await ctx.db.query.posts.findMany({
-      orderBy: (posts, { desc }) => [desc(posts.createdAt)],
+      orderBy: (posts, { desc }) => [desc(posts.created_at)],
     });
     return allPosts;
   }),

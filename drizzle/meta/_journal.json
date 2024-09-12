@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1726060233900,
-      "tag": "0000_late_mentor",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1726075631794,
-      "tag": "0001_chunky_moira_mactaggert",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1726086715912,
-      "tag": "0002_nifty_orphan",
+      "when": 1726117980683,
+      "tag": "0000_smooth_cable",
       "breakpoints": true
     }
   ]
