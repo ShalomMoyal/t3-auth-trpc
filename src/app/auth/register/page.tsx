@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -59,7 +60,7 @@ export default function Register() {
             />
             {error && <div className="text-red-500">{error}</div>}
           </CardContent>
-          <CardFooter>
+          <CardFooter className="flex flex-col space-y-4">
             <Button
               type="submit"
               className="w-full"
@@ -67,6 +68,15 @@ export default function Register() {
             >
               Register
             </Button>
+            <div className="text-center text-sm">
+              Already registered?{" "}
+              <Link
+                href="/auth/signin"
+                className="text-blue-500 hover:underline"
+              >
+                Sign in here
+              </Link>
+            </div>
           </CardFooter>
         </form>
       </Card>

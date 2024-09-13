@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -83,6 +84,15 @@ export default function SignIn() {
             >
               Sign In with Discord
             </Button>
+            <div className="text-center text-sm">
+              Don't have an account?{" "}
+              <Link
+                href="/auth/register"
+                className="text-blue-500 hover:underline"
+              >
+                Register here
+              </Link>
+            </div>
           </CardFooter>
         </form>
       </Card>
