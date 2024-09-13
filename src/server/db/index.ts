@@ -15,4 +15,11 @@ const globalForDb = globalThis as unknown as {
 const conn = globalForDb.conn ?? postgres(env.DATABASE_URL);
 if (env.NODE_ENV !== "production") globalForDb.conn = conn;
 
-export const db = drizzle(conn, { schema });
+export const db = drizzle(conn, {
+  logger: {
+    logQuery: (query) => {
+      console.log(query); // Log the SQL query to the console
+    },
+  },
+  schema,
+});
