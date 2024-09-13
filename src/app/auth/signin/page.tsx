@@ -84,6 +84,15 @@ export default function SignIn() {
             >
               Sign In with Discord
             </Button>
+            <Button
+              type="button"
+              className="w-full"
+              onClick={() =>
+                signIn("google", { callbackUrl: "/examples/post-crud" })
+              }
+            >
+              Sign In with Google
+            </Button>
             <div className="text-center text-sm">
               Don't have an account?{" "}
               <Link

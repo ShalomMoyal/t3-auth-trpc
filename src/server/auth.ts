@@ -6,6 +6,7 @@ import {
 } from "next-auth";
 import { type Adapter } from "next-auth/adapters";
 import DiscordProvider from "next-auth/providers/discord";
+import GoogleProvider from "next-auth/providers/google"; // Add this import
 import CredentialsProvider from "next-auth/providers/credentials";
 import { compare } from "bcryptjs";
 
@@ -53,16 +54,15 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
   },
-  adapter: DrizzleAdapter(db, {
-    users,
-    accounts,
-    sessions,
-    verificationTokens,
-  }) as Adapter,
+  adapter: DrizzleAdapter(db) as Adapter,
   providers: [
     DiscordProvider({
       clientId: env.DISCORD_CLIENT_ID,
       clientSecret: env.DISCORD_CLIENT_SECRET,
+    }),
+    GoogleProvider({
+      clientId: env.GOOGLE_CLIENT_ID,
+      clientSecret: env.GOOGLE_CLIENT_SECRET,
     }),
     CredentialsProvider({
       name: "Credentials",
