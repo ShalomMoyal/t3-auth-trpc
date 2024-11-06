@@ -53,6 +53,31 @@ export const authOptions: NextAuthOptions = {
       }
       return token;
     },
+    signIn: async ({ user, account, profile }) => {
+      if (account?.provider === "google") {
+        const existingUser = await db.query.users.findFirst({
+          where: (users, { eq }) => eq(users.email, user.email ?? ""),
+        });
+
+        if (existingUser) {
+          // User exists, but Google account is not linked
+          await db.insert(accounts).values({
+            type: account.type,
+            provider: account.provider,
+            providerAccountId: account.providerAccountId,
+            access_token: account.access_token,
+            expires_at: account.expires_at,
+            token_type: account.token_type,
+            scope: account.scope,
+            id_token: account.id_token,
+            session_state: account.session_state,
+          });
+
+          return true;
+        }
+      }
+      return true;
+    },
   },
   adapter: DrizzleAdapter(db, {
     usersTable: users,
