@@ -1,0 +1,1 @@
+ALTER TABLE "t3-auth-trpc_proposal" ALTER COLUMN "description" SET NOT NULL;

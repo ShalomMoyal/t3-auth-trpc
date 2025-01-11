@@ -1,0 +1,1 @@
+ALTER TABLE "t3-auth-trpc_proposal" DROP COLUMN IF EXISTS "description";

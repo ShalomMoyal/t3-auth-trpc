@@ -1,0 +1,1 @@
+ALTER TABLE "t3-auth-trpc_user" DROP COLUMN IF EXISTS "fullName";

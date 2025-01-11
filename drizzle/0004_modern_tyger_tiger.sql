@@ -1,0 +1,1 @@
+ALTER TABLE "t3-auth-trpc_proposal" ADD COLUMN "description" varchar(255);

@@ -1,6 +1,8 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { NavBar } from "./NavBar";
+// import { NavBar } from "./NavBar";
+import { ProposalList } from "./proposal-list";
+import {WebAppNavbarComponent} from "./web-app-navbar";
 
 export function AuthorizedLayout({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession();
@@ -17,7 +19,7 @@ export function AuthorizedLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div>
-      <NavBar />
+      <WebAppNavbarComponent />
       <main className="container mx-auto mt-4">{children}</main>
     </div>
   );

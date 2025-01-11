@@ -1,27 +1,19 @@
 import Link from "next/link";
-import { signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
+import { LogOut } from "lucide-react";
+import Image from "next/image";
+import { ModalProposal } from "./modal-form";
 
-export function NavBar() {
+export function Navbar() {
   return (
-    <nav className="bg-gray-800 p-4">
-      <div className="container mx-auto flex justify-between items-center">
-        <div className="flex space-x-4">
-          <Link href="/" className="text-white hover:text-gray-300">
-            Home
-          </Link>
-          <Link
-            href="/examples/post-crud"
-            className="text-white hover:text-gray-300"
-          >
-            Posts
-          </Link>
-        </div>
-        <Button
-          onClick={() => signOut({ callbackUrl: "/auth/signin" })}
-          variant="destructive"
-        >
-          Logout
+    <nav className="flex items-center justify-between border-b bg-background p-4">
+      <Link href="/" className="flex items-center space-x-2">
+        <Image src="/icon.jpg" alt="WebApp Icon" width={170} height={90} />
+      </Link>
+      <div className="flex items-center space-x-4">
+        <ModalProposal />
+        <Button variant="ghost" size="icon" aria-label="Logout">
+          <LogOut className="h-5 w-5" />
         </Button>
       </div>
     </nav>
