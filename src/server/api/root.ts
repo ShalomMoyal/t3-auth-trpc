@@ -2,6 +2,7 @@ import { postRouter } from "@/server/api/routers/post";
 import { authRouter } from "@/server/api/routers/auth";
 import { userRouter } from "./routers/user";
 import { proposalRouter } from "./routers/proposal";
+import { favoritRouter } from "./routers/favoritProposal";
 import { createTRPCRouter, createCallerFactory } from "@/server/api/trpc";
 
 /**
@@ -11,6 +12,7 @@ import { createTRPCRouter, createCallerFactory } from "@/server/api/trpc";
  */
 export const appRouter = createTRPCRouter({
   proposal: proposalRouter,
+  favorit: favoritRouter,
   post: postRouter,
   auth: authRouter,
   user: userRouter,

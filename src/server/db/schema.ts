@@ -58,6 +58,25 @@ export const users = createTable("user", {
 
 export const usersRelations = relations(users, ({ many }) => ({
   accounts: many(accounts),
+  favorit: many(favorit)
+}));
+
+export const favorit = createTable("favorit", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id", { length: 255 })
+    .notNull()
+    .references(() => users.id),
+  proposalId: varchar("proposal_id", { length: 255 })
+    .notNull()
+    .references(() => proposals.id),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+});
+
+export const favoritRelations = relations(favorit, ({ one }) => ({
+  user: one(users, { fields: [favorit.userId], references: [users.id] }),
+  proposal: one(proposals, { fields: [favorit.proposalId], references: [proposals.id] }),
 }));
 
 export const proposals = createTable("proposal", {
@@ -68,11 +87,6 @@ export const proposals = createTable("proposal", {
   contact: varchar("contact", { length: 255 }).notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).default(sql`CURRENT_TIMESTAMP`).notNull(),
   createdById: varchar("created_by", { length: 255 }).notNull().references(() => users.id),  
-})
-
-export const favorites = createTable("favoritesProposal", {
-  id: varchar("id", {length: 255}).notNull(),
-  
 })
 
 export const accounts = createTable(

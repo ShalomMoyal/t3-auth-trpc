@@ -22,13 +22,14 @@ import {
 } from "@/components/ui/pagination";
 import { api } from "@/trpc/react";
 
-
 export function ProposalList() {
-  // Fetch proposals using your API
   const { data: proposals = [], isLoading, isError } = api.proposal.getAll.useQuery();
+  const addFavorite = api.favorit.add.useMutation();
+  const removeFavorite = api.favorit.remove.useMutation();
 
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedRow, setExpandedRow] = useState<number | null>(null);
+  const [favorites, setFavorites] = useState<Record<string, boolean>>({}); // Track favorite states locally
   const itemsPerPage = 10;
 
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -39,6 +40,24 @@ export function ProposalList() {
 
   const toggleRow = (id: number) => {
     setExpandedRow(expandedRow === id ? null : id);
+  };
+
+  const handleFavoriteClick = async (proposalId: string) => {
+    const isCurrentlyFavorite = favorites[proposalId];
+    try {
+      if (isCurrentlyFavorite) {
+        await removeFavorite.mutateAsync({ proposalId });
+      } else {
+        await addFavorite.mutateAsync({ proposalId });
+      }
+      // Update local favorite state
+      setFavorites((prev) => ({
+        ...prev,
+        [proposalId]: !isCurrentlyFavorite,
+      }));
+    } catch (error) {
+      console.error("Error updating favorite:", error);
+    }
   };
 
   if (isLoading) return <p>Loading proposals...</p>;
@@ -56,6 +75,7 @@ export function ProposalList() {
             <TableHead>Study Time</TableHead>
             <TableHead>Contact</TableHead>
             <TableHead>Created At</TableHead>
+            <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -72,7 +92,19 @@ export function ProposalList() {
                 <TableCell>{proposal.contact || 'N/A'}</TableCell>
                 <TableCell>{format(new Date(proposal.createdAt), 'PPP')}</TableCell>
                 <TableCell>
-                  {expandedRow === index ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent row toggle
+                      handleFavoriteClick(proposal.id);
+                    }}
+                    className={`text-sm ${
+                      favorites[proposal.id]
+                        ? 'text-red-500 hover:text-red-700'
+                        : 'text-gray-500 hover:text-gray-700'
+                    }`}
+                  >
+                    {favorites[proposal.id] ? 'Unfavorite' : 'Favorite'}
+                  </button>
                 </TableCell>
               </TableRow>
               {expandedRow === index && (
