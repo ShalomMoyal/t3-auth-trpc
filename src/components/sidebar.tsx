@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Button } from "@/components/ui/button"
-import { User, FileText, Heart } from 'lucide-react'
+import { User, FileText, Heart, Airplay } from 'lucide-react'
 
 export function Sidebar() {
   return (
@@ -21,7 +21,13 @@ export function Sidebar() {
         <Link href="/dashboard/favorites">
           <Button variant="ghost" className="w-full justify-start">
             <Heart className="mr-2 h-4 w-4" />
-            Favorite Posts
+            Favorites Proposals
+          </Button>
+        </Link>
+        <Link href="/dashboard/meetingRoom">
+          <Button variant="ghost" className="w-full justify-start">
+            <Airplay className="mr-2 h-4 w-4" />
+            Meeting room
           </Button>
         </Link>
       </nav>
