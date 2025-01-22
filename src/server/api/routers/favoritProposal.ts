@@ -47,6 +47,7 @@ export const favoritRouter = createTRPCRouter({
         studyTime: proposals.studyTime,
         contact: proposals.contact,
         createdAt: favorit.createdAt,
+        //I need to add user id to req
       })
       .from(favorit)
       .innerJoin(proposals, eq(favorit.proposalId, proposals.id)) // Join with proposal table
