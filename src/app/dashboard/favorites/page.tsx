@@ -20,26 +20,28 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Mail, Airplay } from "lucide-react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import { sendInvite } from "@/app/actions/sendInvite";
+import { toast } from "@/hooks/use-toast";
 
 export default function FavoritesPage() {
-  const { data: session } = useSession();
-  const userID = session?.user?.id;
+  const { data: session, status } = useSession();
 
-  // Add a loading check for session
-  if (!session) return <p>Loading session...</p>;
+  const [selectedProposal, setSelectedProposal] = useState(null);
+  const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
+
+  if (status === "loading") return <p>Loading session...</p>;
+  if (status === "unauthenticated") return <p>You must be logged in to view this page.</p>;
+
+  const userID = session?.user?.id;
 
   const {
     data: favorites,
     isLoading,
     isError,
   } = api.favorit.getUserFaivoritProposal.useQuery();
-  const [inviteEmail, setInviteEmail] = useState("");
-  const [selectedProposal, setSelectedProposal] = useState(null);
 
   if (isLoading) return <p>Loading your favorite posts...</p>;
   if (isError)
@@ -49,14 +51,28 @@ export default function FavoritesPage() {
     return <p>You have no favorite posts yet.</p>;
   }
 
-  const handleInvite = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Here you would typically send the invite email
-    console.log(
-      `Sending invite for proposal ${selectedProposal.proposalId} to ${inviteEmail}`,
+  const handleInvite = async () => {
+    if (!selectedProposal) return;
+
+    const result = await sendInvite(
+      selectedProposal.proposalId,
+      selectedProposal.contact,
     );
-    // Reset the form
-    setInviteEmail("");
+
+    if (result.success) {
+      toast({
+        title: "Invite Sent",
+        description: "The invitation has been sent successfully.",
+      });
+    } else {
+      toast({
+        title: "Error",
+        description: "Failed to send the invitation. Please try again.",
+        variant: "destructive",
+      });
+    }
+
+    setIsInviteDialogOpen(false);
     setSelectedProposal(null);
   };
 
@@ -84,7 +100,10 @@ export default function FavoritesPage() {
               </p>
             </CardContent>
             <CardFooter>
-              <Dialog>
+              <Dialog
+                open={isInviteDialogOpen}
+                onOpenChange={setIsInviteDialogOpen}
+              >
                 <DialogTrigger asChild>
                   <Button
                     variant="outline"
@@ -95,31 +114,20 @@ export default function FavoritesPage() {
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[425px]">
                   <DialogHeader>
-                    <DialogTitle>Invite to Proposal</DialogTitle>
+                    <DialogTitle>Send Invite</DialogTitle>
                     <DialogDescription>
-                      Send an invite email for this proposal. The recipient will
-                      receive details about the study.
+                      Are you sure you want to send an invite for this proposal?
                     </DialogDescription>
                   </DialogHeader>
-                  <form onSubmit={handleInvite}>
-                    <div className="grid gap-4 py-4">
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="email" className="text-right">
-                          Email
-                        </Label>
-                        <Input
-                          id="email"
-                          value={inviteEmail}
-                          onChange={(e) => setInviteEmail(e.target.value)}
-                          placeholder="Enter recipient's email"
-                          className="col-span-3"
-                        />
-                      </div>
-                    </div>
-                    <DialogFooter>
-                      <Button type="submit">Send Invite</Button>
-                    </DialogFooter>
-                  </form>
+                  <DialogFooter>
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsInviteDialogOpen(false)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button onClick={handleInvite}>Send Invite</Button>
+                  </DialogFooter>
                 </DialogContent>
               </Dialog>
               <Link

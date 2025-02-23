@@ -69,11 +69,10 @@ export default function RoomMeetingPage() {
   const proposalID = searchParams.get("proposalID");
   const userID = searchParams.get("userID");
 
-  // In a real application, you would get these values from your backend or environment variables
   const roomID = proposalID;
   const userName = "User" + userID;
-  const appID = 1985400917; // Replace with your actual AppID
-  const serverSecret = "298faf46bcfc0d6d883bb6ff1f7ae5f0"; // Replace with your actual Server Secret
+  const appID = 1985400917; 
+  const serverSecret = "298faf46bcfc0d6d883bb6ff1f7ae5f0";
 
   return (
     <div className="h-screen w-full bg-gray-100">
